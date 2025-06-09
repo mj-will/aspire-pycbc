@@ -61,6 +61,7 @@ def update_global_variables(
     loglikelihood_function : str, optional
         Name of the loglikelihood function to use (default: "loglikelihood").
     """
+    global _global_variables
     _global_variables.pycbc_model = pycbc_model
     _global_variables.loglikelihood_function = loglikelihood_function
 

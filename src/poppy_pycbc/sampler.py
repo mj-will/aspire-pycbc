@@ -72,11 +72,11 @@ class PoppySampler(BaseSampler):
         self.n_samples = n_samples
         self.n_initial_samples = n_initial_samples
 
+        self.inputs = get_inputs_from_pycbc_model(
+            self.model, loglikelihood_function
+        )
         self.pool = choose_pool(mpi=use_mpi, processes=nprocesses)
 
-        self.inputs = get_inputs_from_pycbc_model(
-            model, loglikelihood_function
-        )
         self._sampler: Optional[Poppy] = None
         self._samples: Optional[Any] = None
 
