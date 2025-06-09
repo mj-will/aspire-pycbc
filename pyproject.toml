@@ -27,3 +27,13 @@ test = [
 ]
 
 [tool.setuptools_scm]
+
+[tool.ruff]
+line-length = 79
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+extend-select = ["I"]
