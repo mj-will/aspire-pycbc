@@ -41,7 +41,7 @@ class GlobalVariables:
         Name of the loglikelihood function to use.
     """
 
-    pycbc_model: pycbc.inference.model.Model
+    pycbc_model: "pycbc.inference.model.Model"
     loglikelihood_function: str = "loglikelihood"
 
 
@@ -49,7 +49,7 @@ _global_variables = GlobalVariables(None)
 
 
 def update_global_variables(
-    pycbc_model: pycbc.inference.model.Model,
+    pycbc_model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
 ) -> None:
     """Update the global variables for log likelihood and log prior.
@@ -101,7 +101,7 @@ def _global_log_likelihood(x: np.ndarray) -> float:
     return getattr(model, _global_variables.loglikelihood_function)
 
 
-def get_periodic_parameters(model: Any) -> List[str]:
+def get_periodic_parameters(model: "pycbc.inference.model.Model") -> List[str]:
     """Get a list of periodic parameters from the model.
 
     Parameters
@@ -122,7 +122,9 @@ def get_periodic_parameters(model: Any) -> List[str]:
     return periodic
 
 
-def get_prior_bounds(model: Any) -> Dict[str, List[float]]:
+def get_prior_bounds(
+    model: "pycbc.inference.model.Model",
+) -> Dict[str, List[float]]:
     """Get the prior bounds for the model.
 
     Parameters
@@ -148,7 +150,7 @@ def get_prior_bounds(model: Any) -> Dict[str, List[float]]:
 
 
 def get_poppy_functions(
-    model: pycbc.inference.model.Model,
+    model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
 ) -> Functions:
     """Get log likelihood and log prior functions for poppy.
@@ -188,7 +190,7 @@ def get_poppy_functions(
 
 
 def get_inputs_from_pycbc_model(
-    model: pycbc.inference.model.Model,
+    model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
 ) -> Inputs:
     """Get the inputs for the poppy sampler from a PyCBC model.
@@ -217,7 +219,7 @@ def get_inputs_from_pycbc_model(
 
 
 def samples_from_pycbc_model(
-    model: pycbc.inference.model.Model,
+    model: "pycbc.inference.model.Model",
     n_samples: int,
 ) -> Samples:
     """Draw samples from the prior distribution of a PyCBC model.
