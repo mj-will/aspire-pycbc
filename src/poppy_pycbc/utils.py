@@ -153,6 +153,7 @@ def get_prior_bounds(
 def get_poppy_functions(
     model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
+    likelihood_dtype: str = "float64",
 ) -> Functions:
     """Get log likelihood and log prior functions for poppy.
 
@@ -162,6 +163,8 @@ def get_poppy_functions(
         The PyCBC model.
     loglikelihood_function : str, optional
         Name of the loglikelihood function to use (default: "loglikelihood").
+    likelihood_dtype : str, optional
+        Data type for the likelihood values (default: "float64").
 
     Returns
     -------
@@ -171,11 +174,21 @@ def get_poppy_functions(
     update_global_variables(model, loglikelihood_function)
 
     def log_likelihood(samples: Samples, map_fn=map) -> np.ndarray:
-        """Evaluate log likelihood for a set of samples."""
-        return np.fromiter(
-            map_fn(_global_log_likelihood, samples.x),
+        """Evaluate log likelihood for a set of samples.
+        
+        The log-prior must be evaluated before calling this function.
+        """
+        logl = -np.inf * np.ones(len(samples.x))
+        # Only evaluate the log likelihood for finite log prior
+        if samples.log_prior is None:
+            raise RuntimeError("log-prior has not been evaluated!")
+        mask = np.isfinite(samples.log_prior, dtype=bool)
+        x = np.asarray(samples.x[mask, :], dtype=likelihood_dtype)
+        logl[mask] = np.fromiter(
+            map_fn(_global_log_likelihood, x),
             dtype=float,
         )
+        return logl
 
     def log_prior(samples: Samples, map_fn=map) -> np.ndarray:
         """Evaluate log prior for a set of samples."""
