@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Optional
 
 from poppy import Poppy
@@ -30,6 +31,7 @@ class PoppySampler(BaseSampler):
         loglikelihood_function: str,
         nprocesses: int = 1,
         use_mpi: bool = False,
+        parallelize_prior: bool = True,
         sample_kwds: Optional[Dict[str, Any]] = None,
         fit_kwds: Optional[Dict[str, Any]] = None,
         extra_kwds: Optional[Dict[str, Any]] = None,
@@ -76,6 +78,7 @@ class PoppySampler(BaseSampler):
             self.model, loglikelihood_function
         )
         self.pool = choose_pool(mpi=use_mpi, processes=nprocesses)
+        self.parallelize_prior = parallelize_prior
 
         self._sampler: Optional[Poppy] = None
         self._samples: Optional[Any] = None
@@ -142,7 +145,14 @@ class PoppySampler(BaseSampler):
         """
         extra_kwds = self.extra_kwds.copy()
 
+        if not self.parallelize_prior:
+            logging.info("Log-prior will not be parallelized")
+
         if self._sampler is None:
+            logging.info(
+                "Initializing Poppy sampler with keyword arguments: %s",
+                extra_kwds,
+            )
             self._sampler = Poppy(
                 log_likelihood=self.inputs.log_likelihood,
                 log_prior=self.inputs.log_prior,
@@ -155,9 +165,15 @@ class PoppySampler(BaseSampler):
 
         initial_samples = self.get_initial_samples()
 
+        logging.info("Fitting Poppy sampler to initial samples")
         self._sampler.fit(initial_samples, **self.fit_kwds)
 
-        with self._sampler.enable_pool(self.pool, close_pool=False):
+        logging.info("Sampling posterior with Poppy sampler")
+        with self._sampler.enable_pool(
+            self.pool,
+            close_pool=False,
+            parallelize_prior=self.parallelize_prior,
+        ):
             self._samples = self._sampler.sample_posterior(
                 self.n_samples, **self.sample_kwds
             )
@@ -195,7 +211,8 @@ class PoppySampler(BaseSampler):
         section = "sampler"
         if not cp.get(section, "name") == cls.name:
             raise ValueError(
-                f"Configuration section '{section}' does not match the expected sampler '{cls.name}'."
+                f"Configuration section '{section}' does "
+                f"not match the expected sampler '{cls.name}'."
             )
 
         initial_result_file = cp.get(
@@ -212,6 +229,10 @@ class PoppySampler(BaseSampler):
             fallback="loglikelihood",
         )
 
+        parallelize_prior = cp.getboolean(
+            section, "parallelize_prior", fallback=True
+        )
+
         # Extra keyword arguments from the sampler section
         extra_kwds = dict(cp.items(section)) if cp.has_section(section) else {}
         # Remove known parameters from extra_kwds
@@ -223,6 +244,7 @@ class PoppySampler(BaseSampler):
             "nprocesses",
             "use_mpi",
             "loglikelihood_function",
+            "parallelize_prior",
         ]
         for param in known_params:
             extra_kwds.pop(param, None)
@@ -245,6 +267,7 @@ class PoppySampler(BaseSampler):
             loglikelihood_function=loglikelihood_function,
             nprocesses=nprocesses,
             use_mpi=use_mpi,
+            parallelize_prior=parallelize_prior,
             sample_kwds=sample_kwds,
             extra_kwds=extra_kwds,
             fit_kwds=fit_kwds,
