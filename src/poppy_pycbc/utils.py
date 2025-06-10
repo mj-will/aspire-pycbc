@@ -213,7 +213,7 @@ def get_inputs_from_pycbc_model(
         log_likelihood=functions.log_likelihood,
         log_prior=functions.log_prior,
         dims=len(model.sampling_params),
-        parameters=model.sampling_params,
+        parameters=list(model.sampling_params),
         prior_bounds=get_prior_bounds(model),
         periodic_parameters=get_periodic_parameters(model),
     )
