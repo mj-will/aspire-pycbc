@@ -245,6 +245,7 @@ class PoppySampler(BaseSampler):
             "use_mpi",
             "loglikelihood_function",
             "parallelize_prior",
+            "n_initial_samples",
         ]
         for param in known_params:
             extra_kwds.pop(param, None)
@@ -273,7 +274,7 @@ class PoppySampler(BaseSampler):
             fit_kwds=fit_kwds,
             initial_result_file=initial_result_file,
             n_samples=n_samples,
-            n_initial_samples=n_initial_samples,
+            n_initial_samples=n_initial_samples
         )
         setup_output(obj, output_file=output_file)
 
