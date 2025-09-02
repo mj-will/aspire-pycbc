@@ -165,10 +165,16 @@ class PoppySampler(BaseSampler):
 
         initial_samples = self.get_initial_samples()
 
-        logging.info("Fitting Poppy sampler to initial samples")
+        logging.info(
+            "Fitting Poppy sampler to initial samples with kwargs: %s",
+            self.fit_kwds,
+        )
         self._sampler.fit(initial_samples, **self.fit_kwds)
 
-        logging.info("Sampling posterior with Poppy sampler")
+        logging.info(
+            "Sampling posterior with Poppy sampler with kwargs: %s",
+            self.sample_kwds,
+        )
         with self._sampler.enable_pool(
             self.pool,
             close_pool=False,
@@ -274,7 +280,7 @@ class PoppySampler(BaseSampler):
             fit_kwds=fit_kwds,
             initial_result_file=initial_result_file,
             n_samples=n_samples,
-            n_initial_samples=n_initial_samples
+            n_initial_samples=n_initial_samples,
         )
         setup_output(obj, output_file=output_file)
 
