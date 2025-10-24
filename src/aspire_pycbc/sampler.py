@@ -274,9 +274,10 @@ class AspireSampler(BaseSampler):
             for key, value in kwds.items():
                 kwds[key] = try_literal_eval(value)
 
-        if "sampler_kwargs" not in sample_kwds:
-            sample_kwds["sampler_kwargs"] = {}
-        sample_kwds["sampler_kwargs"].update(sampler_kwargs)
+        if sampler_kwargs:
+            if "sampler_kwargs" not in sample_kwds:
+                sample_kwds["sampler_kwargs"] = {}
+            sample_kwds["sampler_kwargs"].update(sampler_kwargs)
 
         obj = cls(
             model=model,
