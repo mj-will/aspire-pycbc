@@ -3,11 +3,11 @@ requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "poppy-pycbc"
+name = "aspire-pycbc"
 authors = [
     {name = "Michael J. Williams", email = "michaeljw1@googlemail.com"},
 ]
-description = "PyCBC interface for poppy"
+description = "PyCBC interface for aspire"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -16,7 +16,7 @@ classifiers = [
 ]
 dependencies = [
     "pycbc",
-    "poppy",
+    "aspire",
 ]
 
 dynamic = ["version"]

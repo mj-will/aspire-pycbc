@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 import numpy as np
 import numpy.lib.recfunctions as rfn
-from poppy.samples import Samples
+from aspire.samples import Samples
 
 if TYPE_CHECKING:
     import pycbc.inference.model
@@ -22,7 +22,7 @@ Inputs = namedtuple(
         "periodic_parameters",
     ],
 )
-"""Container for the inputs to the poppy sampler."""
+"""Container for the inputs to the aspire sampler."""
 
 
 Functions = namedtuple("Functions", ["log_likelihood", "log_prior"])
@@ -150,12 +150,12 @@ def get_prior_bounds(
     return bounds
 
 
-def get_poppy_functions(
+def get_aspire_functions(
     model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
     likelihood_dtype: str = "float64",
 ) -> Functions:
-    """Get log likelihood and log prior functions for poppy.
+    """Get log likelihood and log prior functions for aspire.
 
     Parameters
     ----------
@@ -175,7 +175,7 @@ def get_poppy_functions(
 
     def log_likelihood(samples: Samples, map_fn=map) -> np.ndarray:
         """Evaluate log likelihood for a set of samples.
-        
+
         The log-prior must be evaluated before calling this function.
         """
         logl = -np.inf * np.ones(len(samples.x))
@@ -207,7 +207,7 @@ def get_inputs_from_pycbc_model(
     model: "pycbc.inference.model.Model",
     loglikelihood_function: str = "loglikelihood",
 ) -> Inputs:
-    """Get the inputs for the poppy sampler from a PyCBC model.
+    """Get the inputs for the aspire sampler from a PyCBC model.
 
     Parameters
     ----------
@@ -219,9 +219,9 @@ def get_inputs_from_pycbc_model(
     Returns
     -------
     Inputs
-        A named tuple containing the inputs for the poppy sampler.
+        A named tuple containing the inputs for the aspire sampler.
     """
-    functions = get_poppy_functions(model, loglikelihood_function)
+    functions = get_aspire_functions(model, loglikelihood_function)
     return Inputs(
         log_likelihood=functions.log_likelihood,
         log_prior=functions.log_prior,

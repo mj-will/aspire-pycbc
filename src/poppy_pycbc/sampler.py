@@ -1,12 +1,12 @@
 import logging
 from typing import Any, Dict, Optional
 
-from poppy import Poppy
-from poppy.samples import Samples
+from aspire import Aspire
+from aspire.samples import Samples
 from pycbc.inference.sampler.base import BaseSampler, setup_output
 from pycbc.pool import choose_pool
 
-from .io import PoppyFile
+from .io import AspireFile
 from .utils import (
     get_inputs_from_pycbc_model,
     samples_from_pycbc_model,
@@ -15,15 +15,15 @@ from .utils import (
 )
 
 
-class PoppySampler(BaseSampler):
+class AspireSampler(BaseSampler):
     """
-    PyCBC sampler interface for the Poppy sampler.
+    PyCBC sampler interface for the Aspire sampler.
 
-    This class wraps the Poppy sampler to be compatible with the PyCBC inference framework.
+    This class wraps the Aspire sampler to be compatible with the PyCBC inference framework.
     """
 
-    name: str = "poppy"
-    _io = PoppyFile
+    name: str = "aspire"
+    _io = AspireFile
 
     def __init__(
         self,
@@ -40,7 +40,7 @@ class PoppySampler(BaseSampler):
         n_initial_samples: Optional[int] = None,
     ):
         """
-        Initialize the PoppySampler.
+        Initialize the AspireSampler.
 
         Parameters
         ----------
@@ -57,7 +57,7 @@ class PoppySampler(BaseSampler):
         fit_kwds : dict, optional
             Additional keyword arguments for fitting.
         extra_kwds : dict, optional
-            Additional keyword arguments for the Poppy sampler.
+            Additional keyword arguments for the Aspire sampler.
         initial_result_file : str, optional
             Path to a file with initial samples.
         n_samples : int, optional
@@ -80,7 +80,7 @@ class PoppySampler(BaseSampler):
         self.pool = choose_pool(mpi=use_mpi, processes=nprocesses)
         self.parallelize_prior = parallelize_prior
 
-        self._sampler: Optional[Poppy] = None
+        self._sampler: Optional[Aspire] = None
         self._samples: Optional[Any] = None
 
     @property
@@ -124,7 +124,7 @@ class PoppySampler(BaseSampler):
         Returns
         -------
         Samples
-            Initial samples for the Poppy sampler.
+            Initial samples for the Aspire sampler.
         """
         if self.initial_result_file is not None:
             return samples_from_pycbc_result(
@@ -138,7 +138,7 @@ class PoppySampler(BaseSampler):
 
     def run(self) -> None:
         """
-        Run the Poppy sampler to generate posterior samples.
+        Run the Aspire sampler to generate posterior samples.
 
         This method initializes the sampler if needed, fits it to the initial samples,
         and then draws posterior samples.
@@ -150,10 +150,10 @@ class PoppySampler(BaseSampler):
 
         if self._sampler is None:
             logging.info(
-                "Initializing Poppy sampler with keyword arguments: %s",
+                "Initializing Aspire sampler with keyword arguments: %s",
                 extra_kwds,
             )
-            self._sampler = Poppy(
+            self._sampler = Aspire(
                 log_likelihood=self.inputs.log_likelihood,
                 log_prior=self.inputs.log_prior,
                 dims=self.inputs.dims,
@@ -166,13 +166,13 @@ class PoppySampler(BaseSampler):
         initial_samples = self.get_initial_samples()
 
         logging.info(
-            "Fitting Poppy sampler to initial samples with kwargs: %s",
+            "Fitting Aspire sampler to initial samples with kwargs: %s",
             self.fit_kwds,
         )
         self._sampler.fit(initial_samples, **self.fit_kwds)
 
         logging.info(
-            "Sampling posterior with Poppy sampler with kwargs: %s",
+            "Sampling posterior with Aspire sampler with kwargs: %s",
             self.sample_kwds,
         )
         with self._sampler.enable_pool(
@@ -192,9 +192,9 @@ class PoppySampler(BaseSampler):
         output_file: Optional[str] = None,
         nprocesses: int = 1,
         use_mpi: bool = False,
-    ) -> "PoppySampler":
+    ) -> "AspireSampler":
         """
-        Create a PoppySampler from a configuration parser.
+        Create a AspireSampler from a configuration parser.
 
         Parameters
         ----------
@@ -211,8 +211,8 @@ class PoppySampler(BaseSampler):
 
         Returns
         -------
-        PoppySampler
-            Configured PoppySampler instance.
+        AspireSampler
+            Configured AspireSampler instance.
         """
         section = "sampler"
         if not cp.get(section, "name") == cls.name:
@@ -288,12 +288,12 @@ class PoppySampler(BaseSampler):
 
     def resume_from_checkpoint(self):
         raise NotImplementedError(
-            "PoppySampler does not support resuming from checkpoints."
+            "AspireSampler does not support resuming from checkpoints."
         )
 
     def checkpoint(self):
         raise NotImplementedError(
-            "PoppySampler does not support checkpointing."
+            "AspireSampler does not support checkpointing."
         )
 
     def finalize(self):

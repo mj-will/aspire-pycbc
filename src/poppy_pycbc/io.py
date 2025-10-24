@@ -5,10 +5,10 @@ from pycbc.inference.io.posterior import (
 )
 
 
-class PoppyFile(BaseSamplerFile):
-    """Class to handle file IO for the ``poppy`` sampler."""
+class AspireFile(BaseSamplerFile):
+    """Class to handle file IO for the ``aspire`` sampler."""
 
-    name = "poppy_file"
+    name = "aspire_file"
 
     def read_raw_samples(self, fields, **kwargs):
         return read_raw_samples_from_file(self, fields, **kwargs)
