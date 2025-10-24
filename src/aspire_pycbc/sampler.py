@@ -256,18 +256,27 @@ class AspireSampler(BaseSampler):
         for param in known_params:
             extra_kwds.pop(param, None)
 
-        section = "sampler.fit"
+        section = "aspire.fit"
         fit_kwds = dict(cp.items(section)) if cp.has_section(section) else {}
 
-        section = "sampler.sample"
+        section = "aspire.sample"
         sample_kwds = (
             dict(cp.items(section)) if cp.has_section(section) else {}
         )
 
+        section = "aspire.sample.sampler_kwargs"
+        sampler_kwargs = (
+            dict(cp.items(section)) if cp.has_section(section) else {}
+        )
+
         # Convert string representations of lists or dicts to actual types
-        for kwds in (extra_kwds, fit_kwds, sample_kwds):
+        for kwds in (extra_kwds, fit_kwds, sample_kwds, sampler_kwargs):
             for key, value in kwds.items():
                 kwds[key] = try_literal_eval(value)
+
+        if "sampler_kwargs" not in sample_kwds:
+            sample_kwds["sampler_kwargs"] = {}
+        sample_kwds["sampler_kwargs"].update(sampler_kwargs)
 
         obj = cls(
             model=model,
